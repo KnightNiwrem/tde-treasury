@@ -45,7 +45,7 @@ telegramMessageSubject.subscribe((request) => {
   }
 
   const matches = text.match(commandRegex);
-  const { itemCode, quantityText } = matches;
+  const { originalCommand, itemCode, quantityText } = matches;
   const quantity = parseInt(quantityText);
   return updateItemQuantity(chat.id, itemCode, multiplier * quantity, from.id);
 });
