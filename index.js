@@ -85,8 +85,7 @@ Common: ${commonItemEntry.quantity}`
   const newPersonalQuantity = Math.max(personalItemEntry.quantity + quantity, 0);
   const newPersonalItemEntry = await Item.query()
   .patch({ quantity: newPersonalQuantity })
-  .where('itemCode', itemCode)
-  .andWhere('telegramId', telegramId)
+  .where('id', personalItemEntry.id)
   .returning('*');
   const hasIncreasedPersonalQuantity = newPersonalItemEntry.quantity >= personalItemEntry.quantity;
 
@@ -97,8 +96,7 @@ Common: ${commonItemEntry.quantity}`
   const newCommonQuantity = isWithdrawal ? candidateCommonQuantity : commonItemEntry.quantity;
   const newCommonItemEntry = await Item.query()
   .patch({ quantity: newCommonQuantity })
-  .where('itemCode', itemCode)
-  .andWhere('telegramId', commonPoolId)
+  .where('id', commonItemEntry.id)
   .returning('*');
   const hasIncreasedCommonQuantity = newCommonItemEntry.quantity >= commonItemEntry.quantity;
 
