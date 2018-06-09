@@ -34,9 +34,9 @@ telegramMessageSubject.subscribe((request) => {
   let commandRegex;
   let multiplier = 1;
   if (text.startsWith('/g_deposit')) {
-    commandRegex = /\/g_deposit_(.+?)_(\d+)/;
+    commandRegex = /\/g_deposit (.+?) (\d+)/;
   } else if (text.startsWith('/g_withdraw')) {
-    commandRegex = /\/g_withdraw_(.+?)_(\d+)/;
+    commandRegex = /\/g_withdraw (.+?) (\d+)/;
     multiplier = -1;
   }
 

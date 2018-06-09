@@ -6,12 +6,12 @@ const config = convict({
   database: {
     doc: 'The database for the TDE Treasury bot',
     default: 'tde',
-    env: 'TDE_DB_NAME',
+    env: `TDE_DB_NAME_${nodeEnv}`,
   },
   host: {
     doc: 'The host for postgres database connection',
     default: '127.0.0.1',
-    env: 'TDE_DB_HOST',
+    env: `TDE_DB_HOST_${nodeEnv}`,
   },
   password: {
     doc: 'The password for the postgres database connection',
@@ -22,7 +22,7 @@ const config = convict({
     doc: 'The port for the postgres database connection',
     format: 'port',
     default: 5432,
-    env: 'TDE_DB_PORT',
+    env: `TDE_DB_PORT_${nodeEnv}`,
   },
   username: {
     doc: 'The username for the postgres database connection',
