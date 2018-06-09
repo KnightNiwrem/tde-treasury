@@ -79,7 +79,7 @@ const updateItemQuantity = async (chatId, itemCode, quantity, telegramId) => {
 Personal: ${personalItemEntry.quantity}
 Common: ${commonItemEntry.quantity}`
     };
-    return TelegramService.sendMessage({ message });
+    return telegramService.sendMessage({ message });
   }
 
   const newPersonalQuantity = Math.max(personalItemEntry.quantity + quantity, 0);
@@ -105,7 +105,7 @@ Common: ${commonItemEntry.quantity}`
 Personal: ${newPersonalItemEntry.quantity} (${newPersonalItemEntry.quantity >= personalItemEntry.quantity ? '+' : '-'}${Math.abs(newPersonalItemEntry.quantity - personalItemEntry.quantity)})
 Common: ${commonItemEntry.quantity} (${newCommonItemEntry.quantity >= commonItemEntry.quantity ? '+' : '-'}${Math.abs(newCommonItemEntry.quantity - commonItemEntry.quantity)})`
   };
-  return TelegramService.sendMessage({ message });
+  return telegramService.sendMessage({ message });
 };
 
 
