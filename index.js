@@ -6,16 +6,17 @@ const TelegramService = require('./services/telegram');
 const telegramService = new TelegramService();
 const telegramMessageSubject = telegramService.getMessageSubject();
 
+const makeTextMessage = (text) => {
+  const chat_id = 41284431;
+  return { chat_id, text };
+};
+
 telegramMessageSubject.subscribe((request) => {
-  // Ignore response without text messages
   const update = request.body;
-  if (isNil(update.message) || isEmpty(update.message.text)) {
-    return;
-  }
+  const { message, edited_message, channel_post, edited_channel_post } = update;
 
-  const chat_id = update.message.chat.id;
-  const text = update.message.text;
-  const message = { chat_id, text };
-
-  telegramService.sendMessage({ message });
+  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(message)}`) });
+  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(edited_message)}`) });
+  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(channel_post)}`) });
+  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(edited_channel_post)}`) });
 });
