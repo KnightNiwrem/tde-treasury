@@ -16,7 +16,7 @@ telegramMessageSubject.subscribe((request) => {
   const { message, edited_message, channel_post, edited_channel_post } = update;
 
   telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(message)}`) });
-  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(edited_message)}`) });
-  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(channel_post)}`) });
-  telegramService.sendMessage({ message: makeTextMessage( `Message: ${JSON.stringify(edited_channel_post)}`) });
+  telegramService.sendMessage({ message: makeTextMessage( `Edited Message: ${JSON.stringify(edited_message)}`) });
+  telegramService.sendMessage({ message: makeTextMessage( `Channel Post: ${JSON.stringify(channel_post)}`) });
+  telegramService.sendMessage({ message: makeTextMessage( `Edited Channel Post: ${JSON.stringify(edited_channel_post)}`) });
 });
