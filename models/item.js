@@ -19,7 +19,7 @@ class Item extends Model {
   }
 
   async patch(attributes) {
-    const patchedObject = await this.query().patch(attributes).where('id', this.id).first().returning('*');
+    const patchedObject = await Item.query().patch(attributes).where('id', this.id).first().returning('*');
     return patchedObject;
   }
 }
