@@ -158,12 +158,12 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
       return `Common: ${item.quantity}`;
     }
 
-    const response = await telegramService._sendRawRequest({ 
+    const responseJSON = await telegramService._sendRawRequest({ 
       telegramMethod: 'getChat', 
       request: { chat_id: item.telegramId } 
     });
-    const user = await response.json();
-    return `${user.first_name}: ${item.quantity}`;
+    const response = await response.json();
+    return `${response.ok ? response.result.first_name : 'Unknown'}: ${item.quantity}`;
   }));
 
   const findText = isEmpty(items) ? 'Common: 0' : findLines.join('\n');

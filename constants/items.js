@@ -86,6 +86,22 @@ const itemCodeToNameEntries = [
   ['a24', 'Silver shield'],
   ['a25', 'Mithril shield'],
 
+  ['k01', 'Champion blade'],
+  ['k02', 'Trident blade'],
+  ['k04', 'War hammer head'],
+  ['k05', 'Hunter blade'],
+  ['k06', 'Order Armor piece'],
+  ['k07', 'Order Helmet fragment'],
+  ['k08', 'Order Boots part'],
+  ['k09', 'Order Gauntlets part'],
+  ['k10', 'Order shield part'],
+  ['k11', 'Hunter Armor part'],
+  ['k12', 'Hunter Helmet fragment'],
+  ['k15', 'Clarity Robe piece'],
+  ['k16', 'Clarity Circlet fragment'],
+  ['k17', 'Clarity Shoes part'],
+  ['k18', 'Clarity Bracers part']
+
   ['p01', 'Vial of Rage'],
   ['p02', 'Potion of Rage'],
   ['p03', 'Bottle of Rage'],
@@ -109,6 +125,23 @@ const itemCodeToNameEntries = [
   ['p21', 'Bottle of Morph'],
   ['pl1', 'Vial of Oblivion'],
   ['pl3', 'Bottle of Oblivion'],
+
+  ['r01', 'Champion Sword recipe'],
+  ['r02', 'Trident recipe'],
+  ['r04', 'War hammer recipe'],
+  ['r05', 'Hunter Dagger recipe'],
+  ['r06', 'Order Armor recipe'],
+  ['r07', 'Order Helmet recipe'],
+  ['r08', 'Order Boots recipe'],
+  ['r09', 'Order Gauntlets recipe'],
+  ['r10', 'Order shield recipe'],
+  ['r11', 'Hunter Armor recipe'],
+  ['r12', 'Hunter Helmet recipe'],
+  ['r15', 'Clarity Robe recipe'],
+  ['r16', 'Clarity Circlet recipe'],
+  ['r17', 'Clarity Shoes recipe'],
+  ['r18', 'Clarity Bracers recipe']
+
   ['s01', '📕Scroll of Rage'],
   ['s02', '📕Scroll of Peace'],
   ['s03', '📗Scroll of Rage'],
@@ -129,7 +162,23 @@ const itemCodeToNameEntries = [
   ['w09', 'Long spear'],
   ['w10', 'Lance'],
   ['w11', 'Elven spear'], 
-  ['w12', 'Halberd']
+  ['w12', 'Halberd'],
+  ['w13', 'Kitchen knife'],
+  ['w14', 'Battle knife'],
+  ['w15', 'Steel dagger'],
+  ['w16', 'Silver dagger'],
+  ['w17', 'Mithril dagger'], 
+  ['w18', 'Short Bow'],
+  ['w19', 'Wooden Bow'],
+  ['w20', 'Long Bow'],
+  ['w21', 'Elven Bow'], 
+  ['w22', 'Forest Bow'],
+  ['w23', 'Club'],
+  ['w24', 'Bone club'],
+  ['w25', 'Heavy club'],
+  ['w26', 'Steel axe'],
+  ['w27', 'Mithril axe'], 
+  ['w32', 'Hunter dagger']
 ];
 
 module.exports = itemCodeToNameEntries;
