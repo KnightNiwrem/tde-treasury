@@ -162,7 +162,7 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
       telegramMethod: 'getChat', 
       request: { chat_id: item.telegramId } 
     });
-    const response = await response.json();
+    const response = await responseJSON.json();
     return `${response.ok ? response.result.first_name : 'Unknown'}: ${item.quantity}`;
   }));
 
