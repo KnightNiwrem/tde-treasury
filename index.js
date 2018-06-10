@@ -85,7 +85,7 @@ summaryRequests.subscribe(async (message) => {
   const [request, searchTerm, ...rest] = text.match(summaryRegex);
 
   const isExact = itemCodeToNameMap.has(searchTerm);
-  const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemName);
+  const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
   const summaryLines = await Promise.all(itemCodes.map(async (itemCode) => {
     const personalCount = await Item.countQuantity((builder) => {
       return builder.where('itemCode', itemCode).andWhere('telegramId', from.id);
