@@ -36,7 +36,8 @@ const warehouseUpdates = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
     const { is_bot, username } = forward_from;
-    return is_bot && !isNil(username) && username === 'chtwrsbot';
+    const isValidGroup = chat.id === -1001159059268 || chat.id === -273163534;
+    return is_bot && isValidGroup && !isNil(username) && username === 'chtwrsbot';
   })
 );
 
