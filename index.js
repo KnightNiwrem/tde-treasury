@@ -37,15 +37,6 @@ const warehouseUpdates = relevantMessages.pipe(
     const { forward_date, forward_from, from, chat, text } = message;
     const { is_bot, username } = forward_from;
     return is_bot && !isNil(username) && username === 'chtwrsbot';
-  }),
-  map((message) => {
-    const { forward_date, forward_from, from, chat, text } = message;
-    const stockStatuses = text.split("\n").slice(1);
-
-    const stockRegex = /(.+?) (.+?) x (\d+)/;
-    return stockStatuses
-    .map((stockStatus) => stockStatus.match(stockRegex))
-    .filter((stockMatches) => !isNil(stockMatches));
   })
 );
 
@@ -64,7 +55,15 @@ const updateRequests = relevantMessages.pipe(
   })
 );
 
-warehouseUpdates.subscribe(async (matches) => {
+warehouseUpdates.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+  const stockStatuses = text.split("\n").slice(1);
+
+  const stockRegex = /(.+?) (.+?) x (\d+)/;
+  const matches = stockStatuses
+  .map((stockStatus) => stockStatus.match(stockRegex))
+  .filter((stockMatches) => !isNil(stockMatches));
+
   matches.forEach(async (match) => {
     const [stockStatus, itemCode, itemName, quantity, ...rest] = match;
     const ownedQuantity = await Item.countQuantity((builder) => {
