@@ -40,6 +40,13 @@ const warehouseUpdates = relevantMessages.pipe(
   })
 );
 
+const helpRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return text.startsWith('/help');
+  })
+);
+
 const summaryRequests = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
@@ -75,6 +82,16 @@ warehouseUpdates.subscribe(async (message) => {
     await commonItemEntry.patch({ quantity: commonQuantity });
   });
   sendTelegramMessage(chat.id, 'Updated guild warehouse state!');
+});
+
+helpRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+  const helpText = `/g_deposit {item code} {quantity} - Claim items under personal balance
+/g_withdraw {item code} {quantity} - Releases items from personal balance (and common balance, if necessary)
+/summary {item code OR partial/full item name} - Presents personal summary
+
+Forward guild warehouse message to update the common pool!`;
+  sendTelegramMessage(chat.id, helpText);
 });
 
 summaryRequests.subscribe(async (message) => {
