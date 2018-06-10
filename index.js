@@ -52,7 +52,7 @@ telegramMessageSubject
     return !isEmpty(text);
   })
 )
-.subscribe((message) => {
+.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
   // Handle guild warehouse updates
@@ -103,7 +103,7 @@ telegramMessageSubject
   const [originalCommand, itemCode, quantityText, ...rest] = matches;
   const itemName = itemCodeToNameMap.has(itemCode) ? itemCodeToNameMap.get(itemCode) : `Mystery Item ${itemCode}`;
   const quantity = parseInt(quantityText);
-  sendTelegramMessage(chat.id, updateItemQuantity(itemCode, itemName, multiplier * quantity, from.id));
+  sendTelegramMessage(chat.id, await updateItemQuantity(itemCode, itemName, multiplier * quantity, from.id));
 });
 
 
