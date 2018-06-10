@@ -7,6 +7,7 @@ exports.up = async function(knex, Promise) {
   const createTable = await knex.schema.createTable('items', (table) => {
     table.increments();
     table.string('itemCode');
+    table.string('itemName');
     table.integer('quantity');
     table.integer('telegramId');
   });
