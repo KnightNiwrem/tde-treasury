@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const { isEmpty, isNil } = require('lodash');
 const { map, filter } = require('rxjs/operators');
 const DatabaseService = require('./services/database');
@@ -36,7 +37,7 @@ const warehouseUpdates = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
     const { is_bot, username } = forward_from;
-    const isValidGroup = chat.id === -1001159059268 || chat.id === -273163534;
+    const isValidGroup = chat.id === -1001159059268;
     return is_bot && isValidGroup && !isNil(username) && username === 'chtwrsbot';
   })
 );
@@ -51,7 +52,14 @@ const helpRequests = relevantMessages.pipe(
 const summaryRequests = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
-    return text.startsWith('/summary ') && !isNil(from);
+    return text.startsWith('/summary') && !isNil(from);
+  })
+);
+
+const findRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return text.startsWith('/find ') && !isNil(from);
   })
 );
 
@@ -98,11 +106,17 @@ Forward guild warehouse message to update the common pool!`;
 summaryRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
-  const summaryRegex = /^\/summary (.+)$/;
+  const summaryRegex = /^\/summary(?: )?(.*)$/;
   const [request, searchTerm, ...rest] = text.match(summaryRegex);
 
   const isExact = itemCodeToNameMap.has(searchTerm);
   const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
+  if (isEmpty(itemCodes)) {
+    const summaryText = `Found no item that matches the term: ${searchTerm}!`;
+    sendTelegramMessage(chat.id, summaryText);
+    return;
+  }
+
   const summaryLines = await Promise.all(itemCodes.map(async (itemCode) => {
     const personalCount = await Item.countQuantity((builder) => {
       return builder.where('itemCode', itemCode).andWhere('telegramId', from.id);
@@ -114,6 +128,46 @@ summaryRequests.subscribe(async (message) => {
   }));
   const summaryText = summaryLines.join('\n');
   sendTelegramMessage(chat.id, summaryText);
+});
+
+findRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+
+  const findRegex = /^\/find (.+)$/;
+  const [request, searchTerm, ...rest] = text.match(findRegex);
+
+  const isExact = itemCodeToNameMap.has(searchTerm);
+  const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
+  if (isEmpty(itemCodes)) {
+    const findText = `Found no item that matches the term: ${searchTerm}`;
+    sendTelegramMessage(chat.id, findText);
+    return;
+  }
+  if (itemCodes.length > 1) {
+    const findText = `Search term for /find must resolve to a single item!
+Given term: ${searchTerm}
+Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).join(', ')}`;
+    sendTelegramMessage(chat.id, findText);
+    return;
+  }
+
+  const findLines = await Promise.all(itemCodes.map(async (itemCode) => {
+    const items = await Item.query().where('itemCode', itemCode);
+    const itemLines = await Promise.all(items.map(async (item) => {
+      if (item.telegramId === commonPoolId) {
+        return `Common: ${item.quantity}`;
+      }
+
+      const response = await telegramService._sendRawRequest({ 
+        telegramMethod: 'getChat', 
+        request: { chat_id: item.telegramId } 
+      });
+      const user = response.json();
+      return `${user.first_name}: ${item.quantity}`;
+    }));
+  }));
+  const findText = findLines.join('\n');
+  sendTelegramMessage(chat.id, findText);
 });
 
 updateRequests.subscribe(async (message) => {
