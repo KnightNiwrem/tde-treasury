@@ -165,8 +165,8 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
     const user = await response.json();
     return `${user.first_name}: ${item.quantity}`;
   }));
-  
-  const findText = findLines.join('\n');
+
+  const findText = isEmpty(items) ? 'Common: 0' : findLines.join('\n');
   sendTelegramMessage(chat.id, findText);
 });
 
