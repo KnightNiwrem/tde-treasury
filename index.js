@@ -12,7 +12,7 @@ const telegramService = new TelegramService();
 
 const updateItemQuantity = async (itemCode, itemName, quantity, telegramId) => {
   const personalItemEntry = await Item.fetchOrCreate(itemCode, telegramId);
-  const commonItemEntry = await Item.fetchOrCreate(itemCode, telegramId);
+  const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
 
   const availableQuantity = personalItemEntry.quantity + commonItemEntry.quantity;
   const finalQuantity = availableQuantity + quantity;
@@ -70,11 +70,12 @@ telegramMessageSubject
     .forEach(async (stockMatches) => {
       const [stockStatus, itemCode, itemName, quantity, ...rest] = stockMatches;
       const ownedQuantity = await Item.countQuantity((builder) => {
-        return builder.where('itemCode', itemCode).andWhere('telegramId', '!=', 0);
+        return builder.where('itemCode', itemCode).andWhere('telegramId', '!=', commonPoolId);
       });
 
       const commonQuantity = quantity - ownedQuantity;
-      await Item.query().patch({ quantity: commonQuantity }).where('itemCode', itemCode).andWhere('telegramId', 0);
+      const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
+      await commonItemEntry.patch({ quantity: commonQuantity });
     });
     sendTelegramMessage(chat.id, 'Updated guild warehouse state!');
     return;
