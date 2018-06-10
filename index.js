@@ -86,6 +86,7 @@ Common: ${commonItemEntry.quantity}`
   const newPersonalItemEntry = await Item.query()
   .patch({ quantity: newPersonalQuantity })
   .where('id', personalItemEntry.id)
+  .first()
   .returning('*');
   const hasIncreasedPersonalQuantity = newPersonalItemEntry.quantity >= personalItemEntry.quantity;
 
@@ -97,6 +98,7 @@ Common: ${commonItemEntry.quantity}`
   const newCommonItemEntry = await Item.query()
   .patch({ quantity: newCommonQuantity })
   .where('id', commonItemEntry.id)
+  .first()
   .returning('*');
   const hasIncreasedCommonQuantity = newCommonItemEntry.quantity >= commonItemEntry.quantity;
 
