@@ -132,3 +132,4 @@ const itemCodeToNameEntries = [
   ['w12', 'Halberd']
 ];
 
+module.exports = itemCodeToNameEntries;
