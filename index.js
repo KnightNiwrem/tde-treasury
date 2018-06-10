@@ -175,10 +175,10 @@ updateRequests.subscribe(async (message) => {
 
   const commandRegex = /^\/g_(deposit|withdraw) (.+?) (\d+)$/;
   const [request, action, itemCode, quantityText, ...rest] = text.match(commandRegex);
-  const multiplier = action === 'deposit' ? 1 : -1;
+  const multiplier = (action === 'deposit') ? 1 : -1;
 
   const itemName = itemCodeToNameMap.has(itemCode) ? itemCodeToNameMap.get(itemCode) : `Mystery Item ${itemCode}`;
-  const quantity = parseInt(quantityText);
+  const quantity = multiplier * parseInt(quantityText);
 
   const personalItemEntry = await Item.fetchOrCreate(itemCode, from.id);
   const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);

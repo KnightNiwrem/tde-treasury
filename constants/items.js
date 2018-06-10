@@ -100,7 +100,7 @@ const itemCodeToNameEntries = [
   ['k15', 'Clarity Robe piece'],
   ['k16', 'Clarity Circlet fragment'],
   ['k17', 'Clarity Shoes part'],
-  ['k18', 'Clarity Bracers part']
+  ['k18', 'Clarity Bracers part'],
 
   ['p01', 'Vial of Rage'],
   ['p02', 'Potion of Rage'],
@@ -140,7 +140,7 @@ const itemCodeToNameEntries = [
   ['r15', 'Clarity Robe recipe'],
   ['r16', 'Clarity Circlet recipe'],
   ['r17', 'Clarity Shoes recipe'],
-  ['r18', 'Clarity Bracers recipe']
+  ['r18', 'Clarity Bracers recipe'],
 
   ['s01', '📕Scroll of Rage'],
   ['s02', '📕Scroll of Peace'],
