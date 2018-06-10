@@ -151,21 +151,21 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
     return;
   }
 
-  const findLines = await Promise.all(itemCodes.map(async (itemCode) => {
-    const items = await Item.query().where('itemCode', itemCode);
-    const itemLines = await Promise.all(items.map(async (item) => {
-      if (item.telegramId === commonPoolId) {
-        return `Common: ${item.quantity}`;
-      }
+  const chosenItemCode = itemCodes[0];
+  const items = await Item.query().where('itemCode', chosenItemCode).andWhere('quantity', '>', 0);
+  const findLines = await Promise.all(items.map(async (item) => {
+    if (item.telegramId === commonPoolId) {
+      return `Common: ${item.quantity}`;
+    }
 
-      const response = await telegramService._sendRawRequest({ 
-        telegramMethod: 'getChat', 
-        request: { chat_id: item.telegramId } 
-      });
-      const user = response.json();
-      return `${user.first_name}: ${item.quantity}`;
-    }));
+    const response = await telegramService._sendRawRequest({ 
+      telegramMethod: 'getChat', 
+      request: { chat_id: item.telegramId } 
+    });
+    const user = await response.json();
+    return `${user.first_name}: ${item.quantity}`;
   }));
+  
   const findText = findLines.join('\n');
   sendTelegramMessage(chat.id, findText);
 });
