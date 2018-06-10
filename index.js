@@ -10,38 +10,13 @@ const itemCodeToNameMap = new Map(require('./constants/items'));
 const databaseService = new DatabaseService();
 const telegramService = new TelegramService();
 
-const updateItemQuantity = async (itemCode, itemName, quantity, telegramId) => {
-  const personalItemEntry = await Item.fetchOrCreate(itemCode, telegramId);
-  const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
-
-  const availableQuantity = personalItemEntry.quantity + commonItemEntry.quantity;
-  const finalQuantity = availableQuantity + quantity;
-  if (finalQuantity < 0) {
-    const text = `Can only withdraw up to ${availableQuantity} ${itemName}:
-Personal: ${personalItemEntry.quantity} ${itemName}
-Common: ${commonItemEntry.quantity} ${itemName}`;
-    return text;
-  }
-
-  const newPersonalQuantity = Math.max(personalItemEntry.quantity + quantity, 0);
-  const newCommonQuantity = commonItemEntry.quantity + Math.min(personalItemEntry.quantity + quantity, 0);
-  const newPersonalItemEntry = await personalItemEntry.patch({ quantity: newPersonalQuantity });
-  const newCommonItemEntry = await commonItemEntry.patch({ quantity: newCommonQuantity });
-
-  const text = `Processed ${quantity > 0 ? 'deposit' : 'withdrawal'} for ${Math.abs(quantity)} ${itemName}.
-Personal: ${newPersonalItemEntry.quantity} (${newPersonalItemEntry.quantity < personalItemEntry.quantity ? '-' : '+'}${Math.abs(newPersonalItemEntry.quantity - personalItemEntry.quantity)})
-Common: ${newCommonItemEntry.quantity} (${newCommonItemEntry.quantity < commonItemEntry.quantity ? '-' : '+'}${Math.abs(newCommonItemEntry.quantity - commonItemEntry.quantity)})`;
-  return text;
-};
-
 const sendTelegramMessage = async (chatId, text) => {
   const message = { chat_id: chatId, text };
   return telegramService.sendMessage({ message });
 };
 
 const telegramMessageSubject = telegramService.getMessageSubject();
-telegramMessageSubject
-.pipe(
+const relevantMessages = telegramMessageSubject.pipe(
   map((request) => {
     const update = request.body;
     const { message } = update;
@@ -51,60 +26,109 @@ telegramMessageSubject
     const { forward_date, forward_from, from, chat, text } = message;
     return !isEmpty(text);
   })
-)
-.subscribe(async (message) => {
-  const { forward_date, forward_from, from, chat, text } = message;
+);
 
-  // Handle guild warehouse updates
-  if (!isNil(forward_from) && text.startsWith("Guild Warehouse:\n")) {
+const warehouseUpdates = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return !isNil(forward_from) && text.startsWith("Guild Warehouse:\n");
+  }),
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
     const { is_bot, username } = forward_from;
-    if (!is_bot || isNil(username) || username !== 'chtwrsbot') {
-      return;
-    }
+    return is_bot && !isNil(username) && username === 'chtwrsbot';
+  }),
+  map((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    const stockStatuses = text.split("\n").slice(1);
 
     const stockRegex = /(.+?) (.+?) x (\d+)/;
-    const stockStatuses = text.split("\n").slice(1);
-    stockStatuses
+    return stockStatuses
     .map((stockStatus) => stockStatus.match(stockRegex))
-    .filter((stockMatches) => !isNil(stockMatches))
-    .forEach(async (stockMatches) => {
-      const [stockStatus, itemCode, itemName, quantity, ...rest] = stockMatches;
-      const ownedQuantity = await Item.countQuantity((builder) => {
-        return builder.where('itemCode', itemCode).andWhere('telegramId', '!=', commonPoolId);
-      });
+    .filter((stockMatches) => !isNil(stockMatches));
+  })
+);
 
-      const commonQuantity = quantity - ownedQuantity;
-      const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
-      await commonItemEntry.patch({ quantity: commonQuantity });
+const summaryRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return text.startsWith('/summary ') && !isNil(from);
+  })
+);
+
+const updateRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    const isValidCommand = text.startsWith('/g_deposit ') || text.startsWith('/g_withdraw ')
+    return !isNil(from) && isValidCommand;
+  })
+);
+
+warehouseUpdates.subscribe(async (matches) => {
+  matches.forEach(async (match) => {
+    const [stockStatus, itemCode, itemName, quantity, ...rest] = match;
+    const ownedQuantity = await Item.countQuantity((builder) => {
+      return builder.where('itemCode', itemCode).andWhere('telegramId', '!=', commonPoolId);
     });
-    sendTelegramMessage(chat.id, 'Updated guild warehouse state!');
-    return;
-  }
 
-  // At this point, we care if the message has a sender
-  if (isNil(from)) {
-    return;
-  }
-
-  // We are only interested in 2 commands
-  let commandRegex;
-  let multiplier = 1;
-  if (text.startsWith('/g_deposit')) {
-    commandRegex = /\/g_deposit (.+?) (\d+)/;
-  } else if (text.startsWith('/g_withdraw')) {
-    commandRegex = /\/g_withdraw (.+?) (\d+)/;
-    multiplier = -1;
-  }
-
-  if (isNil(commandRegex)) {
-    return;
-  }
-
-  const matches = text.match(commandRegex);
-  const [originalCommand, itemCode, quantityText, ...rest] = matches;
-  const itemName = itemCodeToNameMap.has(itemCode) ? itemCodeToNameMap.get(itemCode) : `Mystery Item ${itemCode}`;
-  const quantity = parseInt(quantityText);
-  sendTelegramMessage(chat.id, await updateItemQuantity(itemCode, itemName, multiplier * quantity, from.id));
+    const commonQuantity = quantity - ownedQuantity;
+    const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
+    await commonItemEntry.patch({ quantity: commonQuantity });
+  });
+  sendTelegramMessage(chat.id, 'Updated guild warehouse state!');
 });
 
+summaryRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+
+  const summaryRegex = /^\/summary (.+)$/;
+  const [request, searchTerm, ...rest] = text.match(summaryRegex);
+
+  const isExact = itemCodeToNameMap.has(searchTerm);
+  const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemName);
+  const summaryText = itemCodes.map(async (itemCode) => {
+    const personalCount = await Item.countQuantity((builder) => {
+      return builder.where('itemCode', itemCode).andWhere('telegramId', from.id);
+    });
+    const commonCount = await Item.countQuantity((builder) => {
+      return builder.where('itemCode', itemCode).andWhere('telegramId', commonPoolId);
+    });
+    return `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
+  }).join('\n');
+  sendTelegramMessage(chat.id, summaryText);
+});
+
+updateRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+
+  const commandRegex = /^\/g_(deposit|withdraw) (.+?) (\d+)$/;
+  const [request, action, itemCode, quantityText, ...rest] = text.match(commandRegex);
+  const multiplier = action === 'deposit' ? 1 : -1;
+
+  const itemName = itemCodeToNameMap.has(itemCode) ? itemCodeToNameMap.get(itemCode) : `Mystery Item ${itemCode}`;
+  const quantity = parseInt(quantityText);
+
+  const personalItemEntry = await Item.fetchOrCreate(itemCode, from.id);
+  const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
+
+  const availableQuantity = personalItemEntry.quantity + commonItemEntry.quantity;
+  const finalQuantity = availableQuantity + quantity;
+  if (finalQuantity < 0) {
+    const updateText = `Can only withdraw up to ${availableQuantity} ${itemName}:
+Personal: ${personalItemEntry.quantity} ${itemName}
+Common: ${commonItemEntry.quantity} ${itemName}`;
+    sendTelegramMessage(chat.id, updateText);
+    return;
+  }
+
+  const newPersonalQuantity = Math.max(personalItemEntry.quantity + quantity, 0);
+  const newCommonQuantity = commonItemEntry.quantity + Math.min(personalItemEntry.quantity + quantity, 0);
+  const newPersonalItemEntry = await personalItemEntry.patch({ quantity: newPersonalQuantity });
+  const newCommonItemEntry = await commonItemEntry.patch({ quantity: newCommonQuantity });
+
+  const updateText = `Processed ${quantity > 0 ? 'deposit' : 'withdrawal'} for ${Math.abs(quantity)} ${itemName}.
+Personal: ${newPersonalItemEntry.quantity} (${newPersonalItemEntry.quantity < personalItemEntry.quantity ? '-' : '+'}${Math.abs(newPersonalItemEntry.quantity - personalItemEntry.quantity)})
+Common: ${newCommonItemEntry.quantity} (${newCommonItemEntry.quantity < commonItemEntry.quantity ? '-' : '+'}${Math.abs(newCommonItemEntry.quantity - commonItemEntry.quantity)})`;
+  sendTelegramMessage(chat.id, updateText);
+});
 
