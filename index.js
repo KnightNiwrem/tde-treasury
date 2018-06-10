@@ -86,7 +86,7 @@ summaryRequests.subscribe(async (message) => {
 
   const isExact = itemCodeToNameMap.has(searchTerm);
   const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemName);
-  const summaryText = itemCodes.map(async (itemCode) => {
+  const summaryText = await Promise.all(itemCodes.map(async (itemCode) => {
     const personalCount = await Item.countQuantity((builder) => {
       return builder.where('itemCode', itemCode).andWhere('telegramId', from.id);
     });
@@ -94,7 +94,7 @@ summaryRequests.subscribe(async (message) => {
       return builder.where('itemCode', itemCode).andWhere('telegramId', commonPoolId);
     });
     return `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
-  }).join('\n');
+  })).join('\n');
   sendTelegramMessage(chat.id, summaryText);
 });
 
