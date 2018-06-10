@@ -103,8 +103,7 @@ telegramMessageSubject
   const [originalCommand, itemCode, quantityText, ...rest] = matches;
   const itemName = itemCodeToNameMap.has(itemCode) ? itemCodeToNameMap.get(itemCode) : `Mystery Item ${itemCode}`;
   const quantity = parseInt(quantityText);
-  const text = updateItemQuantity(itemCode, itemName, multiplier * quantity, from.id);
-  sendTelegramMessage(chat.id, text);
+  sendTelegramMessage(chat.id, updateItemQuantity(itemCode, itemName, multiplier * quantity, from.id));
 });
 
 
