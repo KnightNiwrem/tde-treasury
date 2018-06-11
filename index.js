@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { isEmpty, isNil } = require('lodash');
+const { chunk, isEmpty, isNil } = require('lodash');
 const { map, filter } = require('rxjs/operators');
 const DatabaseService = require('./services/database');
 const TelegramService = require('./services/telegram');
@@ -126,8 +126,9 @@ summaryRequests.subscribe(async (message) => {
     });
     return `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
   }));
-  const summaryText = summaryLines.join('\n');
-  sendTelegramMessage(chat.id, summaryText);
+  const summaryLineGroups = chunk(summaryLines, 5);
+  const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
+  summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
 });
 
 findRequests.subscribe(async (message) => {
