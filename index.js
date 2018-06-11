@@ -115,7 +115,7 @@ Forward guild warehouse message to update the common pool!`;
 personalSummaryRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
-  const summaryRegex = /^\/summary(?: )?(.*)$/;
+  const summaryRegex = /^\/personal_summary(?: )?(.*)$/;
   const [request, searchTerm, ...rest] = text.match(summaryRegex);
 
   const isExact = itemCodeToNameMap.has(searchTerm);
@@ -148,7 +148,7 @@ personalSummaryRequests.subscribe(async (message) => {
 fullSummaryRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
-  const summaryRegex = /^\/summary(?: )?(.*)$/;
+  const summaryRegex = /^\/full_summary(?: )?(.*)$/;
   const [request, searchTerm, ...rest] = text.match(summaryRegex);
 
   const isExact = itemCodeToNameMap.has(searchTerm);
