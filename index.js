@@ -189,13 +189,12 @@ findRequests.subscribe(async (message) => {
   const [request, searchTerm, ...rest] = text.match(findRegex);
 
   const exactCodes = new Set([...itemCodeToNameMap.keys()]);
-  const exactNames = new Set([...itemCodeToNameMap.values()]);
-  const isExact = exactCodes.has(searchTerm) || exactCodes.has(searchTerm);
+  const exactNames = new Set([...itemCodeToNameMap.values().map((itemName) => itemName.toLowerCase())]);
 
   let itemCodes = [];
   if (exactCodes.has(searchTerm)) {
     itemCodes.push(searchTerm);
-  } else if (exactNames.has(searchTerm)) {
+  } else if (exactNames.has(searchTerm.toLowerCase())) {
     const exactItemCode = [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase() === searchTerm.toLowerCase()).map(([itemCode, itemName]) => itemCode);
     itemCodes.push(...exactItemCode);
   } else {
