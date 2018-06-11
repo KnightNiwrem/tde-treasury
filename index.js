@@ -25,7 +25,8 @@ const relevantMessages = telegramMessageSubject.pipe(
   }),
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
-    return !isEmpty(text);
+    const isValidGroup = chat.id === -1001159059268 || chat.id === 41284431;
+    return !isEmpty(text) && isValidGroup;
   })
 );
 
@@ -37,8 +38,7 @@ const warehouseUpdates = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
     const { is_bot, username } = forward_from;
-    const isValidGroup = chat.id === -1001159059268 || chat.id === 41284431;
-    return is_bot && isValidGroup && !isNil(username) && username === 'chtwrsbot';
+    return is_bot && !isNil(username) && username === 'chtwrsbot';
   })
 );
 
@@ -114,6 +114,7 @@ Forward guild warehouse message to update the common pool!`;
 
 personalSummaryRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
+  const { first_name } = from;
 
   const summaryRegex = /^\/personal_summary(?: )?(.*)$/;
   const [request, searchTerm, ...rest] = text.match(summaryRegex);
@@ -121,7 +122,8 @@ personalSummaryRequests.subscribe(async (message) => {
   const isExact = itemCodeToNameMap.has(searchTerm);
   const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
   if (isEmpty(itemCodes)) {
-    const summaryText = `Found no item that matches the term: ${searchTerm}!`;
+    const summaryText = `Replying to ${first_name}:
+Found no item that matches the term: ${searchTerm}!`;
     sendTelegramMessage(chat.id, summaryText);
     return;
   }
@@ -139,10 +141,12 @@ personalSummaryRequests.subscribe(async (message) => {
   const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
 
   if (isEmpty(summaryTextGroups)) {
-    sendTelegramMessage(chat.id, 'You have got nothing to your name!');
+    sendTelegramMessage(chat.id, `Replying to ${first_name}:
+You have got nothing to your name!`);
     return;
   }
-  summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
+  summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, `Replying to ${first_name}:
+${summaryText}`));
 });
 
 fullSummaryRequests.subscribe(async (message) => {
