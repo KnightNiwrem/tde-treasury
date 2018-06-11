@@ -189,7 +189,7 @@ findRequests.subscribe(async (message) => {
   const [request, searchTerm, ...rest] = text.match(findRegex);
 
   const exactCodes = new Set([...itemCodeToNameMap.keys()]);
-  const exactNames = new Set([...itemCodeToNameMap.values().map((itemName) => itemName.toLowerCase())]);
+  const exactNames = new Set([...itemCodeToNameMap.values()].map((itemName) => itemName.toLowerCase()));
 
   let itemCodes = [];
   if (exactCodes.has(searchTerm)) {
