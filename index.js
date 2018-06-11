@@ -186,6 +186,10 @@ findRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
   const findRegex = /^\/find (.+)$/;
+  if (!findRegex.test(text)) {
+    sendTelegramMessage(chat.id, `Bad format. Should be /find {exact item code or name}`);
+    return;
+  }
   const [request, searchTerm, ...rest] = text.match(findRegex);
 
   const exactCodes = new Set([...itemCodeToNameMap.keys()]);
@@ -238,6 +242,10 @@ updateRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
   const commandRegex = /^\/g_(deposit|withdraw) (.+?) (\d+)$/;
+  if (!commandRegex.test(text)) {
+    sendTelegramMessage(chat.id, `Bad format. Should be ${text.split(' ')[0]} {item code} {quantity}`);
+    return;
+  }
   const [request, action, itemCode, quantityText, ...rest] = text.match(commandRegex);
   const multiplier = (action === 'deposit') ? 1 : -1;
 
