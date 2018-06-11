@@ -188,8 +188,21 @@ findRequests.subscribe(async (message) => {
   const findRegex = /^\/find (.+)$/;
   const [request, searchTerm, ...rest] = text.match(findRegex);
 
-  const isExact = itemCodeToNameMap.has(searchTerm);
-  const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
+  const exactCodes = new Set([...itemCodeToNameMap.keys()]);
+  const exactNames = new Set([...itemCodeToNameMap.values()]);
+  const isExact = exactCodes.has(searchTerm) || exactCodes.has(searchTerm);
+
+  let itemCodes = [];
+  if (exactCodes.has(searchTerm)) {
+    itemCodes.push(searchTerm);
+  } else if (exactNames.has(searchTerm)) {
+    const exactItemCode = [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase() === searchTerm.toLowerCase()).map(([itemCode, itemName]) => itemCode);
+    itemCodes.push(...exactItemCode);
+  } else {
+    const candidateItemCodes = [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
+    itemCodes.push(...candidateItemCodes);
+  }
+
   if (isEmpty(itemCodes)) {
     const findText = `Found no item that matches the term: ${searchTerm}`;
     sendTelegramMessage(chat.id, findText);
