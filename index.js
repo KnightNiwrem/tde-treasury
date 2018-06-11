@@ -98,6 +98,7 @@ helpRequests.subscribe(async (message) => {
   const helpText = `/g_deposit {item code} {quantity} - Claim items under personal balance
 /g_withdraw {item code} {quantity} - Releases items from personal balance (and common balance, if necessary)
 /summary {item code OR partial/full item name} - Presents personal summary
+/find {exact item code OR exact item name} - Presents a view of all balances for this item
 
 Forward guild warehouse message to update the common pool!`;
   sendTelegramMessage(chat.id, helpText);
@@ -124,9 +125,9 @@ summaryRequests.subscribe(async (message) => {
     const commonCount = await Item.countQuantity((builder) => {
       return builder.where('itemCode', itemCode).andWhere('telegramId', commonPoolId);
     });
-    return `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
+    return personalCount + commonCount === 0 ? '' : `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
   }));
-  const summaryLineGroups = chunk(summaryLines, 20);
+  const summaryLineGroups = chunk(summaryLines.filter((summaryLine) => !isEmpty(summaryLine)), 20);
   const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
   summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
 });
