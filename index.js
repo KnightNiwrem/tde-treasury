@@ -49,10 +49,17 @@ const helpRequests = relevantMessages.pipe(
   })
 );
 
-const summaryRequests = relevantMessages.pipe(
+const personalSummaryRequests = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
-    return text.startsWith('/summary') && !isNil(from);
+    return text.startsWith('/personal_summary') && !isNil(from);
+  })
+);
+
+const fullSummaryRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return text.startsWith('/full_summary') && !isNil(from);
   })
 );
 
@@ -97,14 +104,43 @@ helpRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
   const helpText = `/g_deposit {item code} {quantity} - Claim items under personal balance
 /g_withdraw {item code} {quantity} - Releases items from personal balance (and common balance, if necessary)
-/summary {item code OR partial/full item name} - Presents personal summary
+/personal_summary {item code OR partial/full item name} - Presents personal summary from guild warehouse
+/full_summary {item code OR partial/full item name} - Presents full summary of guild warehouse
 /find {exact item code OR exact item name} - Presents a view of all balances for this item
 
 Forward guild warehouse message to update the common pool!`;
   sendTelegramMessage(chat.id, helpText);
 });
 
-summaryRequests.subscribe(async (message) => {
+personalSummaryRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+
+  const summaryRegex = /^\/summary(?: )?(.*)$/;
+  const [request, searchTerm, ...rest] = text.match(summaryRegex);
+
+  const isExact = itemCodeToNameMap.has(searchTerm);
+  const itemCodes = isExact ? [searchTerm] : [...itemCodeToNameMap.entries()].filter(([itemCode, itemName]) => itemName.toLowerCase().includes(searchTerm.toLowerCase())).map(([itemCode, itemName]) => itemCode);
+  if (isEmpty(itemCodes)) {
+    const summaryText = `Found no item that matches the term: ${searchTerm}!`;
+    sendTelegramMessage(chat.id, summaryText);
+    return;
+  }
+
+  const summaryLines = await Promise.all(itemCodes.map(async (itemCode) => {
+    const personalCount = await Item.countQuantity((builder) => {
+      return builder.where('itemCode', itemCode).andWhere('telegramId', from.id);
+    });
+    const commonCount = await Item.countQuantity((builder) => {
+      return builder.where('itemCode', itemCode).andWhere('telegramId', commonPoolId);
+    });
+    return personalCount === 0 ? '' : `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
+  }));
+  const summaryLineGroups = chunk(summaryLines.filter((summaryLine) => !isEmpty(summaryLine)), 20);
+  const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
+  summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
+});
+
+fullSummaryRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
   const summaryRegex = /^\/summary(?: )?(.*)$/;
