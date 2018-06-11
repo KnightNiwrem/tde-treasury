@@ -126,7 +126,7 @@ summaryRequests.subscribe(async (message) => {
     });
     return `${itemCodeToNameMap.get(itemCode)}: ${personalCount} personal, ${commonCount} common`;
   }));
-  const summaryLineGroups = chunk(summaryLines, 5);
+  const summaryLineGroups = chunk(summaryLines, 20);
   const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
   summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
 });
