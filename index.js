@@ -137,6 +137,11 @@ personalSummaryRequests.subscribe(async (message) => {
   }));
   const summaryLineGroups = chunk(summaryLines.filter((summaryLine) => !isEmpty(summaryLine)), 20);
   const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
+
+  if (isEmpty(summaryTextGroups)) {
+    sendTelegramMessage(chat.id, 'You have got nothing to your name!');
+    return;
+  }
   summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
 });
 
@@ -165,6 +170,11 @@ fullSummaryRequests.subscribe(async (message) => {
   }));
   const summaryLineGroups = chunk(summaryLines.filter((summaryLine) => !isEmpty(summaryLine)), 20);
   const summaryTextGroups = summaryLineGroups.map((summaryLines) => summaryLines.join('\n'));
+
+  if (isEmpty(summaryTextGroups)) {
+    sendTelegramMessage(chat.id, 'The guild has got nothing to its name!');
+    return;
+  }
   summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
 });
 
