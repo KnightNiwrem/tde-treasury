@@ -55,6 +55,11 @@ const itemCodeToNameEntries = [
   ['62', 'Itacory'],
   ['63', 'Assassin Vine'],
   ['64', 'Kloliarway'],
+  ['65', 'Astrulic'],
+  ['66', 'Flammia Nut'],
+  ['67', 'Plexisop'],
+  ['68', 'Mammoth Dill'],
+  ['69', 'Silver dust'],
 
   ['100', 'Pouch of gold'],
   ['501', 'Wrapping'],
