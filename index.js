@@ -24,6 +24,9 @@ const relevantMessages = telegramMessageSubject.pipe(
     return message;
   }),
   filter((message) => {
+    return !isNil(message);
+  }),
+  filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
     const isValidGroup = chat.id === -1001159059268 || chat.id === 41284431;
     return !isEmpty(text) && isValidGroup;
