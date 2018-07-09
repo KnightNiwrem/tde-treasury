@@ -268,7 +268,7 @@ Common: ${commonItemEntry.quantity} ${itemName}`;
     return;
   }
   if (action === 'deposit' && itemCodeQuantityLimit.has(itemCode) && (personalItemEntry.quantity + quantity) > itemCodeQuantityLimit.get(itemCode)) {
-    const limitedPersonalQuantity = Math.max((personalItemEntry.quantity + quantity), itemCodeQuantityLimit.get(itemCode));
+    const limitedPersonalQuantity = Math.max(personalItemEntry.quantity, itemCodeQuantityLimit.get(itemCode));
     const overflowedCommonQuantity = commonItemEntry.quantity + (personalItemEntry.quantity + quantity) - limitedPersonalQuantity;
 
     const newPersonalItemEntry = await personalItemEntry.patch({ quantity: limitedPersonalQuantity });
