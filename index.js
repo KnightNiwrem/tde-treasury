@@ -267,9 +267,9 @@ Common: ${commonItemEntry.quantity} ${itemName}`;
     sendTelegramMessage(chat.id, updateText);
     return;
   }
-  if (action === 'deposit' && itemCodeQuantityLimit.has(itemCode) && finalQuantity > itemCodeQuantityLimit.get(itemCode)) {
-    const limitedPersonalQuantity = Math.max(personalItemEntry.quantity, itemCodeQuantityLimit.get(itemCode));
-    const overflowedCommonQuantity = commonItemEntry.quantity + finalQuantity - limitedPersonalQuantity;
+  if (action === 'deposit' && itemCodeQuantityLimit.has(itemCode) && (personalItemEntry.quantity + quantity) > itemCodeQuantityLimit.get(itemCode)) {
+    const limitedPersonalQuantity = Math.max((personalItemEntry.quantity + quantity), itemCodeQuantityLimit.get(itemCode));
+    const overflowedCommonQuantity = commonItemEntry.quantity + (personalItemEntry.quantity + quantity) - limitedPersonalQuantity;
 
     const newPersonalItemEntry = await personalItemEntry.patch({ quantity: limitedPersonalQuantity });
     const newCommonItemEntry = await commonItemEntry.patch({ quantity: overflowedCommonQuantity });
