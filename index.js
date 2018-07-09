@@ -238,7 +238,7 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
 });
 
 const itemCodeQuantityLimit = new Map([
-  '10', 250
+  ['10', 250]
 ]);
 
 updateRequests.subscribe(async (message) => {
@@ -270,7 +270,7 @@ Common: ${commonItemEntry.quantity} ${itemName}`;
   if (action === 'deposit' && itemCodeQuantityLimit.has(itemCode) && finalQuantity > itemCodeQuantityLimit.get(itemCode)) {
     const limitedPersonalQuantity = Math.max(personalItemEntry.quantity, itemCodeQuantityLimit.get(itemCode));
     const overflowedCommonQuantity = commonItemEntry.quantity + finalQuantity - limitedPersonalQuantity;
-    
+
     const newPersonalItemEntry = await personalItemEntry.patch({ quantity: limitedPersonalQuantity });
     const newCommonItemEntry = await commonItemEntry.patch({ quantity: overflowedCommonQuantity });
 
