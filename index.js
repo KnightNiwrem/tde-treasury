@@ -237,6 +237,10 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
   sendTelegramMessage(chat.id, findText);
 });
 
+const itemCodeQuantityLimit = new Map([
+  '10', 250
+]);
+
 updateRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
@@ -260,6 +264,19 @@ updateRequests.subscribe(async (message) => {
     const updateText = `Can only withdraw up to ${availableQuantity} ${itemName}:
 Personal: ${personalItemEntry.quantity} ${itemName}
 Common: ${commonItemEntry.quantity} ${itemName}`;
+    sendTelegramMessage(chat.id, updateText);
+    return;
+  }
+  if (action === 'deposit' && itemCodeQuantityLimit.has(itemCode) && finalQuantity > itemCodeQuantityLimit.get(itemCode)) {
+    const limitedPersonalQuantity = Math.max(personalItemEntry.quantity, itemCodeQuantityLimit.get(itemCode));
+    const overflowedCommonQuantity = commonItemEntry.quantity + finalQuantity - limitedPersonalQuantity;
+    
+    const newPersonalItemEntry = await personalItemEntry.patch({ quantity: limitedPersonalQuantity });
+    const newCommonItemEntry = await commonItemEntry.patch({ quantity: overflowedCommonQuantity });
+
+    const updateText = `A personal limit of ${itemCodeQuantityLimit.get(itemCode)} has been enforced for this item. Deposits in excess of this limit will be sent to the common pool.
+Personal: ${limitedPersonalQuantity} (+${limitedPersonalQuantity - personalItemEntry.quantity})
+Common: ${overflowedCommonQuantity} (+${overflowedCommonQuantity - commonItemEntry.quantity})`;
     sendTelegramMessage(chat.id, updateText);
     return;
   }
