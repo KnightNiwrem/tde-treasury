@@ -142,6 +142,32 @@ const itemCodeToNameEntries = [
   ['k18', 'Clarity Bracers part'],
   ['k19', 'Thundersoul blade'],
   ['k20', 'Doomblade blade'],
+  ['k21', 'Eclipse blade'],
+  ['k22', 'Guard\'s blade'],
+
+  ['k25', 'Composite Bow shaft'],
+  ['k26', 'Lightning Bow shaft'],
+  ['k27', 'Hailstorm Bow shaft'],
+
+  ['k31', 'Ghost blade'],
+  ['k32', 'Lion blade'],
+
+  ['k34', 'Crusader Helmet fragment'],
+  ['k35', 'Crusader Boots part'],
+  ['k36', 'Crusader Gauntlets part'],
+  ['k37', 'Crusader shield part'],
+
+  ['k39', 'Royal Helmet fragment'],
+
+  ['k50', 'Lion Gloves part'],
+
+  ['k52', 'Demon Circlet fragment'],
+
+  ['k55', 'Divine Robe piece'],
+  ['k56', 'Divine Circlet fragment'],
+
+  ['k59', 'Storm Cloak part'],
+  ['k60', 'Durable Cloak part'],
 
   ['p01', 'Vial of Rage'],
   ['p02', 'Potion of Rage'],
@@ -194,6 +220,26 @@ const itemCodeToNameEntries = [
   ['r25', 'Composite Bow recipe'],
   ['r26', 'Lightning Bow recipe'],
   ['r27', 'Hailstorm Bow recipe'],
+
+  ['r31', 'Ghost Dagger recipe'],
+  ['r32', 'Lion Dagger recipe'],
+
+  ['r34', 'Crusader Helmet recipe'],
+  ['r35', 'Crusader Boots recipe'],
+  ['r36', 'Crusader Gauntlets recipe'],
+  ['r37', 'Crusader shield recipe'],
+
+  ['r39', 'Royal Helmet recipe'],
+
+  ['r50', 'Lion Gloves recipe'],
+
+  ['r52', 'Demon Circlet recipe'],
+
+  ['r55', 'Divine Robe recipe'],
+  ['r56', 'Divine Circlet recipe'],
+
+  ['r59', 'Storm Cloak recipe'],
+  ['r60', 'Durable Cloak recipe'],
 
   ['s01', '📕Scroll of Rage'],
   ['s02', '📕Scroll of Peace'],
