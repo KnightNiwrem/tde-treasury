@@ -122,6 +122,13 @@ const itemCodeToNameEntries = [
   ['a39', 'Clarity Bracers'],
   ['a40', '✏️Pencil of Truth'],
 
+  ['a74', 'Hiking Jar'],
+  ['a75', 'Hiking Bag'],
+
+  ['bx3', 'Zombie Box'],
+  ['ch1', 'Zombie Chest'],
+  ['hk', 'Hunter Kit'],
+
   ['k01', 'Champion blade'],
   ['k02', 'Trident blade'],
   ['k03', 'Hunter shaft'],
@@ -192,6 +199,13 @@ const itemCodeToNameEntries = [
   ['p21', 'Bottle of Morph'],
   ['pl1', 'Vial of Oblivion'],
   ['pl3', 'Bottle of Oblivion'],
+
+  ['pap', 'Accuracy Pill'],
+  ['pgs', 'Garlic Stew'],
+  ['phw', 'Holy Water'],
+  ['pmp', 'Monster Pheromones'],
+  ['psb', 'Silver Blood'],
+  ['pvd', 'Vial of Defiance'],
 
   ['r01', 'Champion Sword recipe'],
   ['r02', 'Trident recipe'],
