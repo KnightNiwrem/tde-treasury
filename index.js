@@ -238,8 +238,14 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
 });
 
 const itemCodeQuantityLimit = new Map([
+  ['01', 500],
+  ['02', 500],
+  ['03', 500],
   ['05', 500],
   ['06', 500],
+  ['07', 500],
+  ['08', 250],
+  ['09', 250],
   ['10', 250]
 ]);
 
