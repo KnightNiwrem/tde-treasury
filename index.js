@@ -275,7 +275,7 @@ topWeightRequests.subscribe(async (message) => {
   .sort((a, b) => {
     return b[2] - a[2];
   })
-  .slice(50);
+  .slice(0, 50);
 
   const orderedItemLines = orderedItemsByWeight.map(([telegramName, itemName, totalWeight]) => {
     return `${telegramName} | ${itemName} | ${totalWeight}`;
