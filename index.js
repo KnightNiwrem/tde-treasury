@@ -74,10 +74,10 @@ const weightRequests = relevantMessages.pipe(
   })
 );
 
-const fullWeightRequests = relevantMessages.pipe(
+const topWeightRequests = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
-    return text.startsWith('/full_weight') && !isNil(from);
+    return text.startsWith('/top_weight') && !isNil(from);
   })
 );
 
@@ -241,7 +241,7 @@ weightRequests.subscribe(async (message) => {
   sendTelegramMessage(chat.id, weightText);
 });
 
-fullWeightRequests.subscribe(async (message) => {
+topWeightRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
   const allItems = await Item.query();
@@ -274,13 +274,14 @@ fullWeightRequests.subscribe(async (message) => {
   .filter((itemTuple) => !isEmpty(itemTuple))
   .sort((a, b) => {
     return b[2] - a[2];
-  });
+  })
+  .slice(50);
 
   const orderedItemLines = orderedItemsByWeight.map(([telegramName, itemName, totalWeight]) => {
     return `${telegramName} | ${itemName} | ${totalWeight}`;
   });
 
-  const fullWeightGroups = chunk(orderedItemLines, 20);
+  const fullWeightGroups = chunk(orderedItemLines, 25);
   const fullWeightTextGroups = fullWeightGroups.map((orderedItemLines) => orderedItemLines.join('\n'));
 
   fullWeightTextGroups.forEach((fullWeightText) => sendTelegramMessage(chat.id, fullWeightText));
