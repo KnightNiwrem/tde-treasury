@@ -74,6 +74,13 @@ const weightRequests = relevantMessages.pipe(
   })
 );
 
+const fullWeightRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return text.startsWith('/full_weight') && !isNil(from);
+  })
+);
+
 const findRequests = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
@@ -220,7 +227,7 @@ weightRequests.subscribe(async (message) => {
     if (telegramId === 0) {
       return `Common: ${weight}`;
     }
-    
+
     const responseJSON = await telegramService._sendRawRequest({ 
       telegramMethod: 'getChat', 
       request: { chat_id: telegramId } 
@@ -232,6 +239,51 @@ weightRequests.subscribe(async (message) => {
 
   const weightText = sortedTelegramNamesToWeightEntries.join('\n');
   sendTelegramMessage(chat.id, weightText);
+});
+
+fullWeightRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+
+  const allItems = await Item.query();
+  const telegramIds = new Set([allItems.map((item) => item.telegramId)]);
+
+  const telegramIdToNameMap = new Map(await Promise.all([...telegramIds.values()].map(async (telegramId) => {
+    if (telegramId === 0) {
+      return [0, 'Common'];
+    }
+
+    const responseJSON = await telegramService._sendRawRequest({ 
+      telegramMethod: 'getChat', 
+      request: { chat_id: telegramId } 
+    });
+    const response = await responseJSON.json();
+    return [telegramId, response.ok ? response.result.first_name : 'Unknown'];
+  })));
+
+  const orderedItemsByWeight = allItems
+  .map((item) => {
+    if (!itemCodeToWeightMap.has(item.itemCode) || !itemCodeToNameMap.has(item.itemCode)) {
+      return [];
+    }
+
+    const itemWeight = itemCodeToWeightMap.get(item.itemCode);
+    const itemName = itemCodeToNameMap.get(item.itemCode);
+    const telegramName = telegramIdToNameMap.get(item.telegramId);
+    return [telegramName, itemName, itemWeight * quantity];    
+  })
+  .filter((itemTuple) => !isEmpty(itemTuple))
+  .sort((a, b) => {
+    return b[2] - a[2];
+  });
+
+  const orderedItemLines = orderedItemsByWeight.map(([telegramName, itemName, totalWeight]) => {
+    return `${telegramName} | ${itemName} | ${totalWeight}`;
+  });
+
+  const fullWeightGroups = chunk(orderedItemLines, 20);
+  const fullWeightTextGroups = fullWeightGroups.map((orderedItemLines) => orderedItemLines.join('\n'));
+
+  fullWeightTextGroups.forEach((fullWeightText) => sendTelegramMessage(chat.id, fullWeightText));
 });
 
 findRequests.subscribe(async (message) => {
