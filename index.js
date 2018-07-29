@@ -245,7 +245,7 @@ fullWeightRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
 
   const allItems = await Item.query();
-  const telegramIds = new Set([allItems.map((item) => item.telegramId)]);
+  const telegramIds = new Set(allItems.map((item) => item.telegramId));
 
   const telegramIdToNameMap = new Map(await Promise.all([...telegramIds.values()].map(async (telegramId) => {
     if (telegramId === 0) {
