@@ -200,7 +200,6 @@ weightRequests.subscribe(async (message) => {
   const allItems = await Item.query();
 
   allItems
-  .filter((item) => item.telegramId !== 0)
   .forEach((item) => {
     if (!itemCodeToWeightMap.has(item.itemCode)) {
       return;
@@ -218,6 +217,10 @@ weightRequests.subscribe(async (message) => {
 
   const sortedTelegramIdToWeightEntries = [...telegramIdToWeightMap.entries()].sort((a, b) => b[1] - a[1]);
   const sortedTelegramNamesToWeightEntries = await Promise.all(sortedTelegramIdToWeightEntries.map(async ([telegramId, weight]) => {
+    if (telegramId === 0) {
+      return `Common: ${weight}`;
+    }
+    
     const responseJSON = await telegramService._sendRawRequest({ 
       telegramMethod: 'getChat', 
       request: { chat_id: telegramId } 
