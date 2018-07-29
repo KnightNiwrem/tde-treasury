@@ -7,6 +7,7 @@ const Item = require('./models/item');
 
 const commonPoolId = 0;
 const itemCodeToNameMap = new Map(require('./constants/items'));
+const itemCodeToWeightMap = new Map(require('./constants/weights'));
 
 const databaseService = new DatabaseService();
 const telegramService = new TelegramService();
@@ -63,6 +64,13 @@ const fullSummaryRequests = relevantMessages.pipe(
   filter((message) => {
     const { forward_date, forward_from, from, chat, text } = message;
     return text.startsWith('/full_summary') && !isNil(from);
+  })
+);
+
+const weightRequests = relevantMessages.pipe(
+  filter((message) => {
+    const { forward_date, forward_from, from, chat, text } = message;
+    return text.startsWith('/weight') && !isNil(from);
   })
 );
 
@@ -183,6 +191,44 @@ fullSummaryRequests.subscribe(async (message) => {
     return;
   }
   summaryTextGroups.forEach((summaryText) => sendTelegramMessage(chat.id, summaryText));
+});
+
+weightRequests.subscribe(async (message) => {
+  const { forward_date, forward_from, from, chat, text } = message;
+
+  const telegramIdToWeightMap = new Map();
+  const allItems = await Item.query();
+
+  allItems
+  .filter((item) => item.telegramId !== 0)
+  .forEach((item) => {
+    if (!itemCodeToWeightMap.has(item.itemCode)) {
+      return;
+    }
+
+    if (!telegramIdToWeightMap.has(item.telegramId)) {
+      telegramIdToWeightMap.set(item.telegramId, 0);
+    }
+
+    const currentWeight = telegramIdToWeightMap.get(item.telegramId);
+    const itemWeight = itemCodeToWeightMap.get(item.itemCode);
+
+    telegramIdToWeightMap.set(item.telegramId, currentWeight + (itemWeight * item.quantity));
+  });
+
+  const sortedTelegramIdToWeightEntries = [...telegramIdToWeightMap.entries()].sort((a, b) => a[1] - b[1]);
+  const sortedTelegramNamesToWeightEntries = await Promise.all(sortedTelegramIdToWeightEntries.map(async ([telegramId, weight]) => {
+    const responseJSON = await telegramService._sendRawRequest({ 
+      telegramMethod: 'getChat', 
+      request: { chat_id: telegramId } 
+    });
+    const response = await responseJSON.json();
+
+    return `${response.ok ? response.result.first_name : 'Unknown'}: ${weight}`;
+  }));
+
+  const weightText = sortedTelegramNamesToWeightEntries.join('\n');
+  sendTelegramMessage(chat.id, weightText);
 });
 
 findRequests.subscribe(async (message) => {
