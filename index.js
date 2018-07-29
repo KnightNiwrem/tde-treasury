@@ -216,7 +216,7 @@ weightRequests.subscribe(async (message) => {
     telegramIdToWeightMap.set(item.telegramId, currentWeight + (itemWeight * item.quantity));
   });
 
-  const sortedTelegramIdToWeightEntries = [...telegramIdToWeightMap.entries()].sort((a, b) => a[1] - b[1]);
+  const sortedTelegramIdToWeightEntries = [...telegramIdToWeightMap.entries()].sort((a, b) => b[1] - a[1]);
   const sortedTelegramNamesToWeightEntries = await Promise.all(sortedTelegramIdToWeightEntries.map(async ([telegramId, weight]) => {
     const responseJSON = await telegramService._sendRawRequest({ 
       telegramMethod: 'getChat', 
