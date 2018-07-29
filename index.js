@@ -281,10 +281,8 @@ topWeightRequests.subscribe(async (message) => {
     return `${telegramName} | ${itemName} | ${totalWeight}`;
   });
 
-  const fullWeightGroups = chunk(orderedItemLines, 25);
-  const fullWeightTextGroups = fullWeightGroups.map((orderedItemLines) => orderedItemLines.join('\n'));
-
-  fullWeightTextGroups.forEach((fullWeightText) => sendTelegramMessage(chat.id, fullWeightText));
+  const topWeightText = orderedItemLines.join('\n');
+  sendTelegramMessage(chat.id, topWeightText);
 });
 
 findRequests.subscribe(async (message) => {
