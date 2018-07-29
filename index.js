@@ -269,7 +269,7 @@ fullWeightRequests.subscribe(async (message) => {
     const itemWeight = itemCodeToWeightMap.get(item.itemCode);
     const itemName = itemCodeToNameMap.get(item.itemCode);
     const telegramName = telegramIdToNameMap.get(item.telegramId);
-    return [telegramName, itemName, itemWeight * quantity];    
+    return [telegramName, itemName, itemWeight * item.quantity];    
   })
   .filter((itemTuple) => !isEmpty(itemTuple))
   .sort((a, b) => {
