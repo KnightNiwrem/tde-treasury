@@ -321,7 +321,7 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
   }
 
   const chosenItemCode = itemCodes[0];
-  const items = await Item.query().where('itemCode', chosenItemCode).andWhere('quantity', '>', 0);
+  const items = await Item.query().where('itemCode', chosenItemCode).andWhere('quantity', '!=', 0);
   const findLines = await Promise.all(items.map(async (item) => {
     if (item.telegramId === commonPoolId) {
       return `Common: ${item.quantity}`;
