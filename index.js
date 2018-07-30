@@ -368,7 +368,7 @@ updateRequests.subscribe(async (message) => {
   const personalItemEntry = await Item.fetchOrCreate(itemCode, from.id);
   const commonItemEntry = await Item.fetchOrCreate(itemCode, commonPoolId);
 
-  const availableQuantity = personalItemEntry.quantity + commonItemEntry.quantity;
+  const availableQuantity = personalItemEntry.quantity + Math.max(commonItemEntry.quantity, 0);
   const finalQuantity = availableQuantity + quantity;
   if (finalQuantity < 0) {
     const updateText = `Can only withdraw up to ${availableQuantity} ${itemName}:
