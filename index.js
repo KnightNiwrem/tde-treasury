@@ -269,20 +269,20 @@ topWeightRequests.subscribe(async (message) => {
     const itemWeight = itemCodeToWeightMap.get(item.itemCode);
     const itemName = itemCodeToNameMap.get(item.itemCode);
     const telegramName = telegramIdToNameMap.get(item.telegramId);
-    return [telegramName, itemName, itemWeight * item.quantity];    
+    return [telegramName, itemName, item.quantity, itemWeight, itemWeight * item.quantity];    
   })
   .filter((itemTuple) => !isEmpty(itemTuple))
   .sort((a, b) => {
-    return b[2] - a[2];
+    return b[4] - a[4];
   })
   .slice(0, 50);
 
-  const orderedItemLines = orderedItemsByWeight.map(([telegramName, itemName, totalWeight]) => {
-    return `${telegramName} | ${itemName} | ${totalWeight}`;
+  const orderedItemLines = orderedItemsByWeight.map(([telegramName, itemName, quantity, weight, totalWeight]) => {
+    return `${telegramName} | ${itemName} | ${quantity} x ${weight}g = ${totalWeight}g`;
   });
 
-  const topWeightText = `Name | Item | Total Weight
----------------------------
+  const topWeightText = `Name | Item | Quantity x Weight = Total Weight
+---------------------------------------------------------------------------------
 ${orderedItemLines.join('\n')}`;
   sendTelegramMessage(chat.id, topWeightText);
 });
