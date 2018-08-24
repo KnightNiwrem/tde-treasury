@@ -281,8 +281,8 @@ topWeightRequests.subscribe(async (message) => {
     return `${telegramName} | ${itemName} | ${quantity} x ${weight}g = ${totalWeight}g`;
   });
 
-  const topWeightText = `Name | Item | Quantity x Weight = Total Weight
---------------------------------------------------
+  const topWeightText = `Name | Item | Count x Wt = Total Wt
+-----------------------------------------------
 ${orderedItemLines.join('\n')}`;
   sendTelegramMessage(chat.id, topWeightText);
 });
