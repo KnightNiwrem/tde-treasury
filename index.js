@@ -339,6 +339,7 @@ Matched Items: ${itemCodes.map((itemCode) => itemCodeToNameMap.get(itemCode)).jo
   sendTelegramMessage(chat.id, findText);
 });
 
+const restrictedUsers = new Set([ 40506052 ]);
 const itemCodeQuantityLimit = new Map([
   ['01', 500],
   ['02', 500],
@@ -353,6 +354,10 @@ const itemCodeQuantityLimit = new Map([
 
 updateRequests.subscribe(async (message) => {
   const { forward_date, forward_from, from, chat, text } = message;
+  if (isNil(from) || restrictedUsers.has(from.id)) {
+    sendTelegramMessage(chat.id, `This user is restricted from /g_deposit and /g_withdraw commands.`);
+    return;
+  }
 
   const commandRegex = /^\/g_(deposit|withdraw) (.+?) (\d+)$/;
   if (!commandRegex.test(text)) {

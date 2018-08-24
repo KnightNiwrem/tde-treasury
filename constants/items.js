@@ -78,7 +78,10 @@ const itemCodeToNameEntries = [
   ['511', 'Steel arrows pack'],
   ['512', 'Silver arrows'],
   ['513', 'Silver arrows pack'],
-
+  ['514', '🎟Gift Coupon \'Pig\''],
+  ['515', '🎟Gift Coupon \'Horse\''],
+  //['516', '🎟Gift Coupon \'Mouse\''],
+  //['517', '🎟Gift Coupon \'Owl\''],
   ['518', 'Hay'],
   ['519', 'Corn'],
   ['520', 'Hamsters'],
