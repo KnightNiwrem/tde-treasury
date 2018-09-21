@@ -328,7 +328,7 @@ const itemCodeToNameEntries = [
   ['s08', '📙Scroll of Peace'],
   ['s11', '📕Rare Scroll of Rage'],
   ['s12', '📕Rare Scroll of Peace'],
-  ['s13', '📗Rare Scroll of Peace'],
+  ['s13', '📗Rare Scroll of Rage'],
   ['s14', '📗Rare Scroll of Peace'],
   ['s15', '📘Rare Scroll of Rage'],
   ['s16', '📘Rare Scroll of Peace'],
