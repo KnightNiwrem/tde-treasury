@@ -427,6 +427,7 @@ const itemCodeToNameEntries = [
   ['er', 'Elder\'s recommendation'],
   ['pol', 'Proof of Loyalty'],
   ['tch', 'Torch'],
+  ['td1', 'Colorless shard'],
   ['tlt', 'Loyalty Trophy'],
 
   ['w01', 'Wooden sword'],
