@@ -424,6 +424,8 @@ const itemCodeToNameEntries = [
   ['s16', '📘Rare Scroll of Peace'],
   ['s17', '📙Rare Scroll of Rage'],
   ['s18', '📙Rare Scroll of Peace'],
+  ['s50', '🖋️Scroll of Engraving'],
+  ['s51', '✒️Scroll of Engraving'],
   ['er', 'Elder\'s recommendation'],
   ['pol', 'Proof of Loyalty'],
   ['tch', 'Torch'],
