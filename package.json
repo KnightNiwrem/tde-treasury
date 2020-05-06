@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +19,8 @@
     "node-fetch": "^2.1.2",
     "objection": "^1.1.10",
     "pg": "^7.4.3",
-    "rxjs": "^6.2.0"
-  }
+    "rxjs": "^6.2.0",
+    "snyk": "^1.319.0"
+  },
+  "snyk": true
 }
