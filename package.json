@@ -13,7 +13,7 @@
     "body-parser": "^1.18.3",
     "convict": "^6.0.1",
     "express": "^4.16.3",
-    "knex": "^0.21.5",
+    "knex": "^0.95.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "objection": "^1.1.10",
