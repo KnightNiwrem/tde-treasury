@@ -13,10 +13,10 @@
     "body-parser": "^1.18.3",
     "convict": "^6.0.1",
     "express": "^4.16.3",
-    "knex": "^0.21.5",
+    "knex": "^0.95.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
-    "objection": "^1.1.10",
+    "objection": "^2.2.4",
     "pg": "^8.3.3",
     "rxjs": "^6.2.0"
   }
